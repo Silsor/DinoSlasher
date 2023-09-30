@@ -11,6 +11,7 @@ public class MapGenerator : MonoBehaviour
     public TileBase wallTile;
     public TileBase floorTile;
     public TileBase obstacleTile;
+    public TileBase startTile;
 
     public int mapWidth = 20;  // Adjust as needed
     public int mapHeight = 20; // Adjust as needed
@@ -106,7 +107,7 @@ public class MapGenerator : MonoBehaviour
 
                     if (setObstacle)
                     {
-                        if (!(rx + ry == 0))
+                        if (!(rx + ry == 0)) //jest pierwszy 
                         {
                             if (grid[rx - 1, ry] == obstacleTile || grid[rx, ry - 1] == obstacleTile || grid[rx - 1, ry - 1] == obstacleTile || grid[rx - 1, ry + 1] == obstacleTile) setObstacle = false;
                         }
@@ -119,6 +120,14 @@ public class MapGenerator : MonoBehaviour
                 }
                 else
                     grid[rx, ry] = floorTile;
+                //if (((rx < 2 || rx > roomWidth) || (ry < 2 || ry > roomHeight)))
+                if (((rx < 2 && ry < 2) || (rx > roomWidth-2 && ry > roomHeight-2)))
+                {
+                    if (rx * ry == 1 || (rx == roomWidth && ry == roomHeight))
+                        grid[rx, ry] = startTile;
+                    else
+                        grid[rx, ry] = floorTile;
+                }
             }
         }
         Debug.Log("mamy przeszkod: " + (100 - maxObstacles));
