@@ -1,6 +1,7 @@
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -17,6 +18,8 @@ public class MapGenerator : MonoBehaviour
     public int maxRoomSize = 8;  // Maximum room size
     public int corridorWidth = 1; // Width of corridors
 
+    private List<Rect> rooms;
+
     void Start()
     {
         GenerateMap();
@@ -24,10 +27,8 @@ public class MapGenerator : MonoBehaviour
 
     void GenerateMap()
     {
-        // Create a 2D grid to represent your map
         TileBase[,] grid = new TileBase[mapWidth, mapHeight];
 
-        // Fill the grid with wall tiles
         for (int x = 0; x < mapWidth; x++)
         {
             for (int y = 0; y < mapHeight; y++)
@@ -36,16 +37,17 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        // Generate rooms and corridors
-        int numRooms = Random.Range(5, 10); // Adjust the range as needed
+        int numRooms = 15;//Random.Range(5, 10);
+
+        rooms = new List<Rect>();
 
         for (int i = 0; i < numRooms; i++)
         {
-            int roomWidth = Random.Range(minRoomSize, maxRoomSize);
-            int roomHeight = Random.Range(minRoomSize, maxRoomSize);
+            int roomWidth, roomHeight, x, y;
+            Rect newRoom = GenerateRoom(out roomWidth, out roomHeight, out x, out y);
+            //Debug.Log("mapWidth: " + x + " " + y);
 
-            int x = Random.Range(1, mapWidth - roomWidth - 1);
-            int y = Random.Range(1, mapHeight - roomHeight - 1);
+            rooms.Add(newRoom);
 
             // Place the floor tiles for the room
             for (int rx = x; rx < x + roomWidth; rx++)
@@ -56,30 +58,30 @@ public class MapGenerator : MonoBehaviour
                 }
             }
 
-            // Connect the rooms with corridors
             if (i > 0)
             {
-                int prevX = Random.Range(1, mapWidth - 1);
-                int prevY = Random.Range(1, mapHeight - 1);
+                int prevX = (int)newRoom.center.x;
+                int prevY = (int)newRoom.center.y;
 
-                // Create a horizontal corridor
+                // Create horizontal corridor
                 for (int cx = Mathf.Min(prevX, x); cx <= Mathf.Max(prevX, x + roomWidth); cx++)
                 {
-                    for (int cy = prevY; cy <= y + roomHeight; cy++)
+                    for (int cy = prevY - corridorWidth / 2; cy <= prevY + corridorWidth / 2; cy++)
                     {
                         grid[cx, cy] = floorTile;
                     }
                 }
 
-                // Create a vertical corridor
+                // Create vertical corridor
                 for (int cy = Mathf.Min(prevY, y); cy <= Mathf.Max(prevY, y + roomHeight); cy++)
                 {
-                    for (int cx = prevX; cx <= x + roomWidth; cx++)
+                    for (int cx = prevX - corridorWidth / 2; cx <= prevX + corridorWidth / 2; cx++)
                     {
                         grid[cx, cy] = floorTile;
                     }
                 }
             }
+
         }
 
         // Place tiles on the Tilemap based on the generated grid
@@ -91,5 +93,24 @@ public class MapGenerator : MonoBehaviour
                 tilemap.SetTile(tilePosition, grid[x, y]);
             }
         }
+    }
+
+    private Rect GenerateRoom(out int roomWidth, out int roomHeight, out int x, out int y)
+    {
+        roomWidth = 2;
+        roomHeight = 3;
+        x = Random.Range(1, mapWidth - roomWidth - 1);
+        y = Random.Range(1, mapHeight - roomHeight - 1);
+        Rect newRoom = new Rect(x, y, roomWidth, roomHeight);
+
+
+        // Check if the new room overlaps with existing rooms
+        foreach (Rect room in rooms)
+        {
+            if (newRoom.Overlaps(room))
+                newRoom = GenerateRoom(out roomWidth, out roomHeight, out x, out y);
+        }
+
+        return newRoom;
     }
 }
