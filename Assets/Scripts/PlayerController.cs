@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
-        Debug.Log("position: " + rb.position + ", dystans :" + Vector3.Distance(FindObjectOfType<MapGenerator>().spawn, transform.position) + "czas : " + GetComponent<Timer>().ShowTime());
+        //Debug.Log("position: " + rb.position + ", dystans :" + Vector3.Distance(FindObjectOfType<MapGenerator>().spawn, transform.position) + "czas : " + GetComponent<Timer>().ShowTime());
 
         //if (rb.position.x < 1)
         //{
