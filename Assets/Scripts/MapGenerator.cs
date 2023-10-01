@@ -120,7 +120,6 @@ public class MapGenerator : MonoBehaviour
                 }
                 else
                     grid[rx, ry] = floorTile;
-                //if (((rx < 2 || rx > roomWidth) || (ry < 2 || ry > roomHeight)))
                 if (((rx < 2 && ry < 2) || (rx > roomWidth-2 && ry > roomHeight-2)))
                 {
                     if (rx * ry == 1 || (rx == roomWidth && ry == roomHeight))
