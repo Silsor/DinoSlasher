@@ -21,6 +21,11 @@ public class PlayerController : MonoBehaviour
         playerControls.Enable();
     }
 
+    private void Start()
+    {
+        transform.position =  FindObjectOfType<MapGenerator>().spawn;
+    }
+
     private void Update()
     {
         PlayerInput();

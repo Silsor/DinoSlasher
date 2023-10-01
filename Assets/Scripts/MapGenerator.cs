@@ -7,27 +7,28 @@ using UnityEngine.Tilemaps;
 
 public class MapGenerator : MonoBehaviour
 {
-    public Tilemap tilemap;
-    public TileBase wallTile;
-    public TileBase floorTile;
-    public TileBase obstacleTile;
-    public TileBase startTile;
+    [SerializeField] Tilemap tilemap;
+    [SerializeField] TileBase wallTile;
+    [SerializeField] TileBase floorTile;
+    [SerializeField] TileBase obstacleTile;
+    [SerializeField] TileBase startTile;
 
-    public int mapWidth = 20;  // Adjust as needed
-    public int mapHeight = 20; // Adjust as needed
+    [SerializeField] int mapWidth = 20;  // Adjust as needed
+    [SerializeField] int mapHeight = 20; // Adjust as needed
 
-    public int RoomSize = 3;  // room size
-    public int corridorWidth = 1; // Width of corridors
+    [SerializeField] int RoomSize = 3;  // room size
+    [SerializeField] int corridorWidth = 1; // Width of corridors
 
     [SerializeField] private int numRooms;
 
     private List<Rect> rooms;
     private TileBase[,] grid;
 
-    void Start()
+    public Vector3 spawn { get; private set; }
+
+    void Awake()
     {
         GenerateMap();
-        //GenerateRoom();
     }
 
     void GenerateMap()
@@ -120,15 +121,23 @@ public class MapGenerator : MonoBehaviour
                 }
                 else
                     grid[rx, ry] = floorTile;
-                if (((rx < 2 && ry < 2) || (rx > roomWidth-2 && ry > roomHeight-2)))
+
+                if ((rx <= 2 && ry <= 2) || (rx > roomWidth - 2 && ry > roomHeight - 2))
                 {
-                    if (rx * ry == 1 || (rx == roomWidth && ry == roomHeight))
+                    if (rx * ry == 1)
+                    {
                         grid[rx, ry] = startTile;
+                        spawn = new Vector3(rx, ry, 0);
+                    }
+                    else if (rx == roomWidth && ry == roomHeight)
+                        grid[rx, ry] = startTile;
+
                     else
                         grid[rx, ry] = floorTile;
                 }
             }
         }
+
         Debug.Log("mamy przeszkod: " + (100 - maxObstacles));
     }
 
